@@ -9,9 +9,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "tasks")
 public class Task {
