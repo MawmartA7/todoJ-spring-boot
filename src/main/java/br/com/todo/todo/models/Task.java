@@ -1,13 +1,12 @@
 package br.com.todo.todo.models;
 
+import br.com.todo.todo.dto.TaskDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -23,18 +22,21 @@ public class Task {
     private long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String name;
 
     @Column(nullable = false)
-    @NotBlank
     private String description;
 
     @Column(nullable = false)
-    @NotNull
     private int priority;
 
     @Column(nullable = false)
-    @NotNull
     private boolean done;
+
+    public Task(TaskDTO taskDTO) {
+        this.name = taskDTO.name();
+        this.description = taskDTO.description();
+        this.priority = taskDTO.priority();
+        this.done = taskDTO.done();
+    }
 }
