@@ -40,4 +40,23 @@ public class TaskServices {
             return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
         }
     }
+
+    public ResponseEntity<?> patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
+        Optional<Task> existingTask = taskRepository.findById(taskId);
+        if (existingTask.isPresent()) {
+            Task taskToUpdate = existingTask.get();
+            if (taskDTO.name() != null && !(taskDTO.name().equals(taskToUpdate.getName())))
+                taskToUpdate.setName(taskDTO.name());
+            if (taskDTO.description() != null && !(taskDTO.description().equals(taskToUpdate.getDescription())))
+                taskToUpdate.setDescription(taskDTO.description());
+            if (taskDTO.priority() != null && !(taskDTO.priority().equals(taskToUpdate.getPriority())))
+                taskToUpdate.setPriority(taskDTO.priority());
+            if (taskDTO.done() != null && !(taskDTO.done().equals(taskToUpdate.getDone())))
+                taskToUpdate.setDone(taskDTO.done());
+
+            return new ResponseEntity<>(taskRepository.save(taskToUpdate), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+        }
+    }
 }
