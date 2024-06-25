@@ -33,7 +33,7 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<?> putUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
+    public ResponseEntity<?> putUpdateTask(@RequestBody @Valid TaskDTO taskDTO, @PathVariable Long taskId) {
         return services.putUpdateTask(taskDTO, taskId);
     }
 

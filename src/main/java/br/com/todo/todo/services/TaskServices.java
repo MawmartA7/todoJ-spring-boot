@@ -27,10 +27,6 @@ public class TaskServices {
     }
 
     public ResponseEntity<?> putUpdateTask(TaskDTO taskDTO, Long taskId) {
-        if (taskId == null) {
-            return new ResponseEntity<>("enter the id of the task to be edited", HttpStatus.BAD_REQUEST);
-        }
-
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             Task updatedTask = new Task(taskDTO, taskId);
