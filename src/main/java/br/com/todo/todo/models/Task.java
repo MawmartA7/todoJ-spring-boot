@@ -41,4 +41,12 @@ public class Task {
         this.priority = taskDTO.priority();
         this.done = taskDTO.done();
     }
+
+    public Task(TaskDTO taskDTO, Long id) {
+        this.id = id;
+        this.name = taskDTO.name();
+        this.description = taskDTO.description();
+        this.priority = taskDTO.priority();
+        this.done = taskDTO.done();
+    }
 }
