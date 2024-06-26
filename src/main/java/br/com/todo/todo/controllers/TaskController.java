@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.todo.todo.dto.TaskDTO;
 import br.com.todo.todo.services.TaskServices;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,11 @@ public class TaskController {
         return services.getAllTasks();
     }
 
+    @GetMapping("/{taskId}")
+    private ResponseEntity<?> getTaskById(@PathVariable @Valid @NotNull Long taskId) {
+        return services.getTaskById(taskId);
+    }
+
     @GetMapping("/done")
     private ResponseEntity<?> getAllDoneTasks() {
         return services.getAllDoneTasks();
@@ -39,22 +45,22 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<?> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
+    private ResponseEntity<?> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
         return services.postCreateTask(taskDTO);
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<?> putUpdateTask(@RequestBody @Valid TaskDTO taskDTO, @PathVariable Long taskId) {
+    private ResponseEntity<?> putUpdateTask(@RequestBody @Valid TaskDTO taskDTO, @PathVariable Long taskId) {
         return services.putUpdateTask(taskDTO, taskId);
     }
 
     @PatchMapping("/{taskId}")
-    public ResponseEntity<?> patchPartialUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
+    private ResponseEntity<?> patchPartialUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
         return services.patchPartialUpdateTask(taskDTO, taskId);
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long taskId) {
+    private ResponseEntity<?> deleteTask(@PathVariable Long taskId) {
         return services.deleteTask(taskId);
     }
 }

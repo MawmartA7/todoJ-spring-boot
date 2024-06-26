@@ -21,6 +21,10 @@ public class TaskServices {
         return new ResponseEntity<>(taskRepository.findAll(), HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getTaskById(Long taskId) {
+        return new ResponseEntity<>(taskRepository.findById(taskId).get(), HttpStatus.OK);
+    }
+
     public ResponseEntity<?> getAllDoneTasks() {
         return new ResponseEntity<>(taskRepository.findByDoneTrue(), HttpStatus.OK);
     }
