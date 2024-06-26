@@ -28,6 +28,11 @@ public class TaskController {
         return services.getAllTasks();
     }
 
+    @GetMapping("/done")
+    private ResponseEntity<?> getAllDoneTasks() {
+        return services.getAllDoneTasks();
+    }
+
     @PostMapping
     public ResponseEntity<?> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
         return services.postCreateTask(taskDTO);
