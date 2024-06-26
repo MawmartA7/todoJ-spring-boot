@@ -22,7 +22,12 @@ public class TaskServices {
     }
 
     public ResponseEntity<?> getTaskById(Long taskId) {
-        return new ResponseEntity<>(taskRepository.findById(taskId).get(), HttpStatus.OK);
+        Optional<Task> task = taskRepository.findById(taskId);
+        if (task.isPresent()) {
+            return new ResponseEntity<>(task.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     public ResponseEntity<?> getAllDoneTasks() {
