@@ -25,6 +25,10 @@ public class TaskServices {
         return new ResponseEntity<>(taskRepository.findByDoneTrue(), HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getAllPendingTasks() {
+        return new ResponseEntity<>(taskRepository.findByDoneFalse(), HttpStatus.OK);
+    }
+
     public ResponseEntity<?> postCreateTask(@Valid TaskDTO taskDTO) {
         Task newTask = taskRepository.save(new Task(taskDTO));
         return new ResponseEntity<>(newTask, HttpStatus.CREATED);

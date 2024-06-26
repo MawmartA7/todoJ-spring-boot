@@ -33,6 +33,11 @@ public class TaskController {
         return services.getAllDoneTasks();
     }
 
+    @GetMapping("/pending")
+    private ResponseEntity<?> getAllPendingTasks() {
+        return services.getAllPendingTasks();
+    }
+
     @PostMapping
     public ResponseEntity<?> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
         return services.postCreateTask(taskDTO);

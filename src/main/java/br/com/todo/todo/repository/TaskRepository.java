@@ -8,4 +8,6 @@ import br.com.todo.todo.models.Task;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     public Task[] findByDoneTrue();
+
+    public Task[] findByDoneFalse();
 }
