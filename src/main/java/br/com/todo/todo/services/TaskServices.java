@@ -55,4 +55,14 @@ public class TaskServices {
             return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
         }
     }
+
+    public ResponseEntity<?> deleteTask(Long taskId) {
+        Optional<Task> existingTask = taskRepository.findById(taskId);
+        if (existingTask.isPresent()) {
+            taskRepository.deleteById(taskId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+        }
+    }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,5 +41,10 @@ public class TaskController {
     @PatchMapping("/{taskId}")
     public ResponseEntity<?> patchPartialUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
         return services.patchPartialUpdateTask(taskDTO, taskId);
+    }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long taskId) {
+        return services.deleteTask(taskId);
     }
 }
