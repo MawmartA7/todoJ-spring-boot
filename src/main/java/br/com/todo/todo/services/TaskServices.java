@@ -77,7 +77,7 @@ public class TaskServices {
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             taskRepository.deleteById(taskId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
         }
