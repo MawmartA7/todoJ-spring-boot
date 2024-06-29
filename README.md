@@ -4,12 +4,12 @@ This API was created for learning purposes and study practice. It is a simple CR
 
 ## Tecnologies stack
 
-|tecnologie|version|
-|:----:|:---:|
-| [java](https://www.oracle.com/java) | 21 |
-| [Maven](https://maven.apache.org) | 3.9.8 |
-| [Spring boot](https://spring.io/) | 3.3.1 |
-| [postgresql](https://www.postgresql.org)| 16 |
+|tecnologie|version|download_requirement|
+|:----:|:---:|:--:|
+| [java](https://www.oracle.com/java) | 21 |require|
+| [Maven](https://maven.apache.org) | 3.9.8 |require|
+| [Spring boot](https://spring.io/) | 3.3.1 |don't have download|
+| [postgresql](https://www.postgresql.org)| 16 |optional|
 
 ---
 
