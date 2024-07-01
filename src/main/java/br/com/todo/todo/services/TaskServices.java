@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.com.todo.todo.dto.TaskDTO;
+import br.com.todo.todo.exceptions.NotFoudException;
 import br.com.todo.todo.models.Task;
 import br.com.todo.todo.repository.TaskRepository;
 import jakarta.validation.Valid;
@@ -26,7 +27,8 @@ public class TaskServices {
         if (task.isPresent()) {
             return new ResponseEntity<>(task.get(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+            throw new NotFoudException("Task not found",
+                    "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
@@ -50,7 +52,8 @@ public class TaskServices {
             taskRepository.save(updatedTask);
             return new ResponseEntity<>(updatedTask, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+            throw new NotFoudException("Task not found",
+                    "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
@@ -69,7 +72,8 @@ public class TaskServices {
 
             return new ResponseEntity<>(taskRepository.save(taskToUpdate), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+            throw new NotFoudException("Task not found",
+                    "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
@@ -79,7 +83,8 @@ public class TaskServices {
             taskRepository.deleteById(taskId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<>("task not found", HttpStatus.NOT_FOUND);
+            throw new NotFoudException("Task not found",
+                    "It was not possible to find a task with the specified id, try another one.");
         }
     }
 }
