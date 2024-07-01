@@ -1,9 +1,10 @@
 package br.com.todo.todo.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 public record TaskDTO(
-        Long id, @NotBlank String name, @NotBlank String description, @NotNull Integer priority,
-        @NotNull Boolean done) {
+                Long id, @NotBlank(message = "Message must be filled with characters") String name,
+                @NotBlank(message = "Description must be filled with characters") String description,
+                @NotNull(message = "Priority cannot be empty") @Positive(message = "Priority cannot be negative or zero") Integer priority,
+                @NotNull(message = "Done cannot be null") Boolean done) {
 }
