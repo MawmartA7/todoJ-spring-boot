@@ -1,36 +1,38 @@
 package br.com.todo.todo.services;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.todo.todo.dto.TaskDTO;
+import br.com.todo.todo.exceptions.NotFoundException;
+import br.com.todo.todo.models.Task;
+import br.com.todo.todo.repository.TaskRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import br.com.todo.todo.dto.ErrorMessageDTO;
-import br.com.todo.todo.dto.TaskDTO;
-import br.com.todo.todo.exceptions.NotFoudException;
-import br.com.todo.todo.models.Task;
-import br.com.todo.todo.repository.TaskRepository;
-import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServices {
-    @Autowired
-    private TaskRepository taskRepository;
 
-    public ResponseEntity<?> getAllTasks() {
-        return new ResponseEntity<>(taskRepository.findAll(), HttpStatus.OK);
+    private final TaskRepository taskRepository;
+
+    public TaskServices(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
-    public ResponseEntity<?> getTaskById(Long taskId) {
-        Optional<Task> task = taskRepository.findById(taskId);
-        if (task.isPresent()) {
-            return new ResponseEntity<>(task.get(), HttpStatus.OK);
-        } else {
-            throw new NotFoudException("Task not found",
-                    "It was not possible to find a task with the specified id, try another one.");
-        }
+    public List<TaskDTO> getAllTasks() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "priority").and(Sort.by(Sort.Direction.ASC, "id"));
+        List<Task> taskList = taskRepository.findAll(sort);
+        return taskList.stream().map(TaskDTO::new).collect(Collectors.toList());
+    }
+
+    public TaskDTO getTaskById(Long taskId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(
+                () -> new NotFoundException("Task not found",
+                        "It was not possible to find a task with the specified id, try another one."));
+        return new TaskDTO(task);
     }
 
     public ResponseEntity<?> getAllDoneTasks() {
@@ -41,30 +43,27 @@ public class TaskServices {
         return new ResponseEntity<>(taskRepository.findByDoneFalse(), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> postCreateTask(@Valid TaskDTO taskDTO) {
-        Task newTask = taskRepository.save(new Task(taskDTO));
-        return new ResponseEntity<>(newTask, HttpStatus.CREATED);
+    public List<TaskDTO> postCreateTask(TaskDTO taskDTO) {
+        taskRepository.save(new Task(taskDTO));
+        return getAllTasks();
     }
 
-    public ResponseEntity<?> putUpdateTask(TaskDTO taskDTO, Long taskId) {
+    public List<TaskDTO> putUpdateTask(TaskDTO taskDTO, Long taskId) {
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             Task updatedTask = new Task(taskDTO, taskId);
             taskRepository.save(updatedTask);
-            return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+            return getAllTasks();
         } else {
-            throw new NotFoudException("Task not found",
+            throw new NotFoundException("Task not found",
                     "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
-    public ResponseEntity<?> patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
+    public List<TaskDTO> patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
         if (taskDTO.name() == null && taskDTO.description() == null && taskDTO.priority() == null
                 && taskDTO.done() == null) {
-            ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(HttpStatus.BAD_REQUEST,
-                    "At least one field must be provided to update the task",
-                    "at least one of the fields must be filled in to be able to make a change to a task");
-            return new ResponseEntity<>(errorMessageDTO, HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("At least one field must be provided to update the task");
         }
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
@@ -77,21 +76,20 @@ public class TaskServices {
                 taskToUpdate.setPriority(taskDTO.priority());
             if (taskDTO.done() != null && !(taskDTO.done().equals(taskToUpdate.getDone())))
                 taskToUpdate.setDone(taskDTO.done());
-
-            return new ResponseEntity<>(taskRepository.save(taskToUpdate), HttpStatus.OK);
+            taskRepository.save(taskToUpdate);
+            return getAllTasks();
         } else {
-            throw new NotFoudException("Task not found",
+            throw new NotFoundException("Task not found",
                     "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
-    public ResponseEntity<?> deleteTask(Long taskId) {
+    public void deleteTask(Long taskId) {
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             taskRepository.deleteById(taskId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            throw new NotFoudException("Task not found",
+            throw new NotFoundException("Task not found",
                     "It was not possible to find a task with the specified id, try another one.");
         }
     }

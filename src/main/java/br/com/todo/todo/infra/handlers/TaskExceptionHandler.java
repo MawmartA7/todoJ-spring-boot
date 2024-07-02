@@ -16,13 +16,13 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.todo.todo.dto.ErrorMessageDTO;
-import br.com.todo.todo.exceptions.NotFoudException;
+import br.com.todo.todo.exceptions.NotFoundException;
 
 @ControllerAdvice
 public class TaskExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(NotFoudException.class)
-    public ResponseEntity<ErrorMessageDTO> notFoudExecption(NotFoudException exception) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorMessageDTO> handleNotFoundException(NotFoundException exception) {
         ErrorMessageDTO errorDTO = new ErrorMessageDTO(HttpStatus.NOT_FOUND, exception.getMessage(),
                 exception.getDetails());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
