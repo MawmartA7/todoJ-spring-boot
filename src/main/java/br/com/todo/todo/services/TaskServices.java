@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import br.com.todo.todo.dto.ErrorMessageDTO;
 import br.com.todo.todo.dto.TaskDTO;
 import br.com.todo.todo.exceptions.NotFoudException;
 import br.com.todo.todo.models.Task;
@@ -58,6 +59,13 @@ public class TaskServices {
     }
 
     public ResponseEntity<?> patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
+        if (taskDTO.name() == null && taskDTO.description() == null && taskDTO.priority() == null
+                && taskDTO.done() == null) {
+            ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(HttpStatus.BAD_REQUEST,
+                    "At least one field must be provided to update the task",
+                    "at least one of the fields must be filled in to be able to make a change to a task");
+            return new ResponseEntity<>(errorMessageDTO, HttpStatus.BAD_REQUEST);
+        }
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             Task taskToUpdate = existingTask.get();
