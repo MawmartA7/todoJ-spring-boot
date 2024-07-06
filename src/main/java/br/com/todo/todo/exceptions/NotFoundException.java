@@ -3,15 +3,15 @@ package br.com.todo.todo.exceptions;
 import lombok.Getter;
 
 @Getter
-public class NotFoudException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
     String details;
 
-    public NotFoudException() {
+    public NotFoundException() {
         super("Task not found");
         this.details = "the task could not be found or recovered";
     }
 
-    public NotFoudException(String message, String details) {
+    public NotFoundException(String message, String details) {
         super(message);
         this.details = details;
     }
