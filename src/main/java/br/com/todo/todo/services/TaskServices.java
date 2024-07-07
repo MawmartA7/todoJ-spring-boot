@@ -43,24 +43,22 @@ public class TaskServices {
         return new ResponseEntity<>(taskRepository.findByDoneFalse(), HttpStatus.OK);
     }
 
-    public List<TaskDTO> postCreateTask(TaskDTO taskDTO) {
-        taskRepository.save(new Task(taskDTO));
-        return getAllTasks();
+    public TaskDTO postCreateTask(TaskDTO taskDTO) {
+        return new TaskDTO(taskRepository.save(new Task(taskDTO)));
     }
 
-    public List<TaskDTO> putUpdateTask(TaskDTO taskDTO, Long taskId) {
+    public TaskDTO putUpdateTask(TaskDTO taskDTO, Long taskId) {
         Optional<Task> existingTask = taskRepository.findById(taskId);
         if (existingTask.isPresent()) {
             Task updatedTask = new Task(taskDTO, taskId);
-            taskRepository.save(updatedTask);
-            return getAllTasks();
+            return new TaskDTO(taskRepository.save(updatedTask));
         } else {
             throw new NotFoundException("Task not found",
                     "It was not possible to find a task with the specified id, try another one.");
         }
     }
 
-    public List<TaskDTO> patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
+    public TaskDTO patchPartialUpdateTask(TaskDTO taskDTO, Long taskId) {
         if (taskDTO.name() == null && taskDTO.description() == null && taskDTO.priority() == null
                 && taskDTO.done() == null) {
             throw new IllegalArgumentException("At least one field must be provided to update the task");
@@ -76,8 +74,7 @@ public class TaskServices {
                 taskToUpdate.setPriority(taskDTO.priority());
             if (taskDTO.done() != null && !(taskDTO.done().equals(taskToUpdate.getDone())))
                 taskToUpdate.setDone(taskDTO.done());
-            taskRepository.save(taskToUpdate);
-            return getAllTasks();
+            return new TaskDTO(taskRepository.save(taskToUpdate));
         } else {
             throw new NotFoundException("Task not found",
                     "It was not possible to find a task with the specified id, try another one.");

@@ -41,17 +41,17 @@ public class TaskController {
     }
 
     @PostMapping
-    private ResponseEntity<List<TaskDTO>> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
+    private ResponseEntity<TaskDTO> postCreateTask(@RequestBody @Valid TaskDTO taskDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(services.postCreateTask(taskDTO));
     }
 
     @PutMapping("/{taskId}")
-    private ResponseEntity<List<TaskDTO>> putUpdateTask(@RequestBody @Valid TaskDTO taskDTO, @PathVariable Long taskId) {
+    private ResponseEntity<TaskDTO> putUpdateTask(@RequestBody @Valid TaskDTO taskDTO, @PathVariable Long taskId) {
         return ResponseEntity.ok(services.putUpdateTask(taskDTO, taskId));
     }
 
     @PatchMapping("/{taskId}")
-    private ResponseEntity<List<TaskDTO>> patchPartialUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
+    private ResponseEntity<TaskDTO> patchPartialUpdateTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId) {
         return ResponseEntity.ok(services.patchPartialUpdateTask(taskDTO, taskId));
     }
 
