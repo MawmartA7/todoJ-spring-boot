@@ -4,11 +4,9 @@ import br.com.todo.todo.dto.TaskDTO;
 import br.com.todo.todo.exceptions.NotFoundException;
 import br.com.todo.todo.models.Task;
 import br.com.todo.todo.repository.TaskRepository;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,9 +21,10 @@ public class TaskServices {
     }
 
     public List<TaskDTO> getAllTasks() {
-        Sort sort = Sort.by(Sort.Direction.DESC, "priority").and(Sort.by(Sort.Direction.ASC, "id"));
-        List<Task> taskList = taskRepository.findAll(sort);
-        return taskList.stream().map(TaskDTO::new).collect(Collectors.toList());
+        List<Task> taskList = taskRepository.findAll();
+        return taskList.stream().map(TaskDTO::new)
+                .sorted(Comparator.comparing(TaskDTO::priority).thenComparing(TaskDTO::id))
+                .collect(Collectors.toList());
     }
 
     public TaskDTO getTaskById(Long taskId) {
@@ -35,12 +34,18 @@ public class TaskServices {
         return new TaskDTO(task);
     }
 
-    public ResponseEntity<?> getAllDoneTasks() {
-        return new ResponseEntity<>(taskRepository.findByDoneTrue(), HttpStatus.OK);
+    public List<TaskDTO> getAllDoneTasks() {
+        List<Task> taskList = taskRepository.findByDoneTrue();
+        return taskList.stream().map(TaskDTO::new)
+                .sorted(Comparator.comparing(TaskDTO::priority).thenComparing(TaskDTO::id))
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> getAllPendingTasks() {
-        return new ResponseEntity<>(taskRepository.findByDoneFalse(), HttpStatus.OK);
+    public List<TaskDTO> getAllPendingTasks() {
+        List<Task> taskList = taskRepository.findByDoneFalse();
+        return taskList.stream().map(TaskDTO::new)
+                .sorted(Comparator.comparing(TaskDTO::priority).thenComparing(TaskDTO::id))
+                .collect(Collectors.toList());
     }
 
     public TaskDTO postCreateTask(TaskDTO taskDTO) {

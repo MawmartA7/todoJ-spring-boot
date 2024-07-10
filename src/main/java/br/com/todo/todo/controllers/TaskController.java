@@ -31,13 +31,13 @@ public class TaskController {
     }
 
     @GetMapping("/done")
-    private ResponseEntity<?> getAllDoneTasks() {
-        return services.getAllDoneTasks();
+    private ResponseEntity<List<TaskDTO>> getAllDoneTasks() {
+        return ResponseEntity.ok(services.getAllDoneTasks());
     }
 
     @GetMapping("/pending")
-    private ResponseEntity<?> getAllPendingTasks() {
-        return services.getAllPendingTasks();
+    private ResponseEntity<List<TaskDTO>> getAllPendingTasks() {
+        return ResponseEntity.ok(services.getAllPendingTasks());
     }
 
     @PostMapping
