@@ -1,23 +1,28 @@
 package br.com.todo.todo.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.todo.todo.dto.TaskDTO;
+import br.com.todo.todo.exceptions.NotFoundException;
 import br.com.todo.todo.models.Task;
 import br.com.todo.todo.repository.TaskRepository;
 
@@ -30,6 +35,8 @@ public class TaskServicesTest {
     @InjectMocks
     private TaskServices taskServices;
 
+    @Captor
+    private ArgumentCaptor<Long> idCArgumentCaptor;
     private TaskDTO taskDTO;
     private List<TaskDTO> tasksDTO;
     private Task task;
@@ -63,6 +70,38 @@ public class TaskServicesTest {
             List<TaskDTO> taskListReturned = taskServices.getAllTasks();
             assertEquals(List.of().size(), taskListReturned.size());
             verify(repository, times(1)).findAll();
+        }
+    }
+
+    @Nested
+    public class GetTaskByIdTests {
+
+        @Test
+        @DisplayName("Should be return a existent task by id")
+        void shouldReturnedAExistentTaskById() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(task));
+
+            TaskDTO taskDTOReturned = taskServices.getTaskById(1L);
+
+            assertEquals(taskDTO, taskDTOReturned);
+            assertEquals(idCArgumentCaptor.getValue(), taskDTOReturned.id());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.capture());
+        }
+
+        @Test
+        @DisplayName("It should throw a NotFoundException exception when the task is not found")
+        void shouldThrowNotFoundExceptionWhenTaskNotFound() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.empty());
+
+            NotFoundException exceptionReturned = assertThrows(NotFoundException.class,
+                    () -> taskServices.getTaskById(1L));
+
+            assertEquals("Task not found", exceptionReturned.getMessage());
+            assertEquals("It was not possible to find a task with the specified id, try another one.",
+                    exceptionReturned.getDetails());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.capture());
         }
     }
 }
