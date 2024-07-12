@@ -38,27 +38,37 @@ public class TaskServicesTest {
     @Captor
     private ArgumentCaptor<Long> idCArgumentCaptor;
     private TaskDTO taskDTO;
+    private TaskDTO taskDTO2;
+    private TaskDTO taskDTO3;
     private List<TaskDTO> tasksDTO;
     private Task task;
+    private Task task2;
+    private Task task3;
     private List<Task> tasks;
 
     @BeforeEach
     public void setup() {
-        taskDTO = new TaskDTO(1L, "Task name", "Task description", 1, false);
-        tasksDTO = Arrays.asList(taskDTO);
-        task = new Task(1L, "Task name", "Task description", 1, false);
-        tasks = Arrays.asList(task);
+        taskDTO = new TaskDTO(1L, "Task name", "Task description", 2, false);
+        taskDTO2 = new TaskDTO(2L, "Other task name", "Other task description", 1, true);
+        taskDTO3 = new TaskDTO(3L, "Other task name", "Other task description", 1, true);
+        tasksDTO = Arrays.asList(taskDTO, taskDTO2, taskDTO3);
+        task = new Task(1L, "Task name", "Task description", 2, false);
+        task2 = new Task(2L, "Other task name", "Other task description", 1, true);
+        task3 = new Task(3L, "Other task name", "Other task description", 1, true);
+        tasks = Arrays.asList(task, task2, task3);
     }
 
     @Nested
-    public class GetAllTaskTests {
+    public class GetAllTasksTests {
 
         @Test
         @DisplayName("Should be return a task List existent")
         void shouldBeReturnedATaskListExistent() {
             when(repository.findAll()).thenReturn(tasks);
             List<TaskDTO> taskDTOListReturned = taskServices.getAllTasks();
-            assertEquals(tasksDTO.get(0), taskDTOListReturned.get(0));
+            assertEquals(tasksDTO.get(1), taskDTOListReturned.get(0));
+            assertEquals(tasksDTO.get(2), taskDTOListReturned.get(1));
+            assertEquals(tasksDTO.get(0), taskDTOListReturned.get(2));
             assertEquals(tasksDTO.size(), taskDTOListReturned.size());
             verify(repository, times(1)).findAll();
         }
@@ -102,6 +112,30 @@ public class TaskServicesTest {
                     exceptionReturned.getDetails());
 
             verify(repository, times(1)).findById(idCArgumentCaptor.capture());
+        }
+    }
+
+    @Nested
+    public class getAllDoneTasks {
+
+        @Test
+        @DisplayName("Should be return a task list with done tasks")
+        void shouldReturnedADoneTasksList() {
+            when(repository.findByDoneTrue()).thenReturn(Arrays.asList(task2, task3));
+            List<TaskDTO> taskDTOListReturned = taskServices.getAllDoneTasks();
+            assertEquals(tasksDTO.get(1), taskDTOListReturned.get(0));
+            assertEquals(tasksDTO.get(2), taskDTOListReturned.get(1));
+            assertEquals(tasksDTO.size() - 1, taskDTOListReturned.size());
+            verify(repository, times(1)).findByDoneTrue();
+        }
+
+        @Test
+        @DisplayName("Should be return a empty task list with done tasks")
+        void shouldReturnedAnEmptyDoneTasksList() {
+            when(repository.findByDoneTrue()).thenReturn(Arrays.asList());
+            List<TaskDTO> taskListReturned = taskServices.getAllDoneTasks();
+            assertEquals(0, taskListReturned.size());
+            verify(repository, times(1)).findByDoneTrue();
         }
     }
 }
