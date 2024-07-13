@@ -189,10 +189,11 @@ public class TaskServicesTest {
             assertNotNull(taskDTOReturned);
             assertTrue(taskDTOReturned instanceof TaskDTO);
             assertEquals(task.getId(), taskDTOReturned.id());
-            assertEquals(taskArgumentCaptor.getValue().getName(), taskDTOReturned.name());
-            assertEquals(taskArgumentCaptor.getValue().getDescription(), taskDTOReturned.description());
-            assertEquals(taskArgumentCaptor.getValue().getPriority(), taskDTOReturned.priority());
-            assertEquals(taskArgumentCaptor.getValue().getDone(), taskDTOReturned.done());
+            assertEquals(task.getName(), taskArgumentCaptor.getValue().getName());
+            assertEquals(task.getDescription(), taskArgumentCaptor.getValue().getDescription());
+            assertEquals(task.getPriority(), taskArgumentCaptor.getValue().getPriority());
+            assertEquals(task.getDone(), taskArgumentCaptor.getValue().getDone());
+            assertEquals(taskDTO, taskDTOReturned);
 
             verify(repository, times(1)).save(taskArgumentCaptor.capture());
         }
