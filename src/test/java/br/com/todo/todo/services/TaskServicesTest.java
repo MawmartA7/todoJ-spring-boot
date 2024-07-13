@@ -107,7 +107,7 @@ public class TaskServicesTest {
             assertEquals(taskDTO, taskDTOReturned);
             assertEquals(idCArgumentCaptor.getValue(), taskDTOReturned.id());
 
-            verify(repository, times(1)).findById(idCArgumentCaptor.capture());
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
         }
 
         @Test
@@ -122,7 +122,7 @@ public class TaskServicesTest {
             assertEquals("It was not possible to find a task with the specified id, try another one.",
                     exceptionReturned.getDetails());
 
-            verify(repository, times(1)).findById(idCArgumentCaptor.capture());
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
         }
     }
 
@@ -195,8 +195,9 @@ public class TaskServicesTest {
             assertEquals(task.getDone(), taskArgumentCaptor.getValue().getDone());
             assertEquals(taskDTO, taskDTOReturned);
 
-            verify(repository, times(1)).save(taskArgumentCaptor.capture());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
         }
+    }
 
     }
 }
