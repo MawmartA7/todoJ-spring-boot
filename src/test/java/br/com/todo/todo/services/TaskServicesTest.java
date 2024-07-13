@@ -1,7 +1,9 @@
 package br.com.todo.todo.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,10 @@ public class TaskServicesTest {
 
     @Captor
     private ArgumentCaptor<Long> idCArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<Task> taskArgumentCaptor;
+
     private TaskDTO taskDTO;
     private TaskDTO taskDTO2;
     private TaskDTO taskDTO3;
@@ -166,5 +172,30 @@ public class TaskServicesTest {
             assertEquals(0, taskListReturned.size());
             verify(repository, times(1)).findByDoneFalse();
         }
+    }
+
+    @Nested
+    public class postCreateTask {
+
+        @Test
+        @DisplayName("Should be return a new task created")
+        void shouldReturnedANewTaskCreated() {
+            TaskDTO taskDTOWithoutId = new TaskDTO(null, "Task name", "Task description", 2, false);
+
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(task);
+
+            TaskDTO taskDTOReturned = taskServices.postCreateTask(taskDTOWithoutId);
+
+            assertNotNull(taskDTOReturned);
+            assertTrue(taskDTOReturned instanceof TaskDTO);
+            assertEquals(task.getId(), taskDTOReturned.id());
+            assertEquals(taskArgumentCaptor.getValue().getName(), taskDTOReturned.name());
+            assertEquals(taskArgumentCaptor.getValue().getDescription(), taskDTOReturned.description());
+            assertEquals(taskArgumentCaptor.getValue().getPriority(), taskDTOReturned.priority());
+            assertEquals(taskArgumentCaptor.getValue().getDone(), taskDTOReturned.done());
+
+            verify(repository, times(1)).save(taskArgumentCaptor.capture());
+        }
+
     }
 }
