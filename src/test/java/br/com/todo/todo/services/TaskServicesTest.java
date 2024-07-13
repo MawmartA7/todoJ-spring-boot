@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -199,5 +200,41 @@ public class TaskServicesTest {
         }
     }
 
+    @Nested
+    class putUpdateTask {
+
+        @Test
+        @DisplayName("Should be return an updated task")
+        void shouldReturnedAnUpdatedTask() {
+            Task taskToUpdate = new Task(1L, "Task name to update", "Task description to update", 1, true);
+
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(task);
+
+            TaskDTO taskDTOUpdatedReturned = taskServices.putUpdateTask(taskDTO, 1L);
+
+            assertNotNull(taskDTOUpdatedReturned);
+            assertTrue(taskDTOUpdatedReturned instanceof TaskDTO);
+            assertEquals(taskDTO, taskDTOUpdatedReturned);
+            assertTrue(taskToUpdate.getId() == taskDTO.id() && taskArgumentCaptor.getValue().getId() == taskDTO.id());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("It should throw a NotFoundException exception when the task to be updated is not found")
+        void shouldThrowNotFoundExceptionWhenTaskToUpdateNotFound() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.empty());
+            NotFoundException exceptionReturned = assertThrows(NotFoundException.class,
+                    () -> taskServices.putUpdateTask(taskDTO, 1L));
+
+            assertEquals("Task not found", exceptionReturned.getMessage());
+            assertEquals("It was not possible to find a task with the specified id, try another one.",
+                    exceptionReturned.getDetails());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(0)).save(any());
+        }
     }
 }
