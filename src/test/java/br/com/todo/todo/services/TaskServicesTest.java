@@ -237,4 +237,72 @@ public class TaskServicesTest {
             verify(repository, times(0)).save(any());
         }
     }
+
+    @Nested
+    class patchPartialUpdateTask {
+        @Test
+        @DisplayName("Should be return a partially updated task")
+        void shouldReturnedAPartiallyUpdatedTask() {
+            Task taskUpdatedExpected = new Task(1L, "Task name updated", "Task description not updated ", 2,
+                    true);
+            Task taskToUpdate = new Task(1L, "Task name to update", "Task description not updated", 3, true);
+            TaskDTO partialUpdate = new TaskDTO(null, "Task name updated", null, 2, null);
+
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
+
+            TaskDTO taskDTOPartiallyUpdatedReturned = taskServices.patchPartialUpdateTask(partialUpdate, 1L);
+
+            assertNotNull(taskDTOPartiallyUpdatedReturned);
+            assertTrue(taskDTOPartiallyUpdatedReturned instanceof TaskDTO);
+            assertTrue(taskToUpdate.getId() == taskUpdatedExpected.getId()
+                    && taskArgumentCaptor.getValue().getId() == taskUpdatedExpected.getId());
+
+            assertEquals(taskArgumentCaptor.getValue().getName(), taskDTOPartiallyUpdatedReturned.name());
+
+            assertEquals(taskUpdatedExpected.getName(), taskDTOPartiallyUpdatedReturned.name());
+            assertEquals(taskUpdatedExpected.getDescription(), taskDTOPartiallyUpdatedReturned.description());
+            assertEquals(taskUpdatedExpected.getPriority(), taskDTOPartiallyUpdatedReturned.priority());
+            assertEquals(taskUpdatedExpected.getDone(), taskDTOPartiallyUpdatedReturned.done());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("It should not update the task when the given fields are null")
+        void shouldNotUpdateTaskWhenFieldsAreNull() {
+
+        }
+
+        @Test
+        @DisplayName("It should throw a NotFoundException exception when the task to be partially updated is not found")
+        void shouldThrowNotFoundExceptionWhenTaskToUpdateNotFound() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.empty());
+
+            NotFoundException exceptionReturned = assertThrows(NotFoundException.class,
+                    () -> taskServices.patchPartialUpdateTask(taskDTO, 1L));
+
+            assertEquals("Task not found", exceptionReturned.getMessage());
+            assertEquals("It was not possible to find a task with the specified id, try another one.",
+                    exceptionReturned.getDetails());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(0)).save(any());
+        }
+
+        @Test
+        @DisplayName("It should throw an IllegalArgumentException exception when at least one field is not provided to update the task other than the id")
+        void shouldThrowBadRequestExceptionWhenPriorityIsOutOfRange() {
+            TaskDTO taskDTOEmpty = new TaskDTO(null, null, null, null, null);
+
+            IllegalArgumentException exceptionReturned = assertThrows(IllegalArgumentException.class,
+                    () -> taskServices.patchPartialUpdateTask(taskDTOEmpty, 1L));
+
+            assertEquals("At least one field must be provided to update the task", exceptionReturned.getMessage());
+
+            verify(repository, times(0)).findById(any());
+            verify(repository, times(0)).save(any());
+        }
+    }
 }
