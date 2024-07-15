@@ -103,7 +103,7 @@ public class TaskServicesTest {
         void shouldReturnedAExistentTaskById() {
             when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(task));
 
-            TaskDTO taskDTOReturned = taskServices.getTaskById(1L);
+            TaskDTO taskDTOReturned = taskServices.getTaskById(task.getId());
 
             assertEquals(taskDTO, taskDTOReturned);
             assertEquals(idCArgumentCaptor.getValue(), taskDTOReturned.id());
@@ -211,7 +211,7 @@ public class TaskServicesTest {
             when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
             when(repository.save(taskArgumentCaptor.capture())).thenReturn(task);
 
-            TaskDTO taskDTOUpdatedReturned = taskServices.putUpdateTask(taskDTO, 1L);
+            TaskDTO taskDTOUpdatedReturned = taskServices.putUpdateTask(taskDTO, taskToUpdate.getId());
 
             assertNotNull(taskDTOUpdatedReturned);
             assertTrue(taskDTOUpdatedReturned instanceof TaskDTO);
@@ -251,7 +251,8 @@ public class TaskServicesTest {
             when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
             when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
 
-            TaskDTO taskDTOPartiallyUpdatedReturned = taskServices.patchPartialUpdateTask(partialUpdate, 1L);
+            TaskDTO taskDTOPartiallyUpdatedReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+                    taskToUpdate.getId());
 
             assertNotNull(taskDTOPartiallyUpdatedReturned);
             assertTrue(taskDTOPartiallyUpdatedReturned instanceof TaskDTO);
@@ -313,9 +314,9 @@ public class TaskServicesTest {
         void shouldDeleteATask() {
             when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(task));
 
-            taskServices.deleteTask(1L);
+            taskServices.deleteTask(task.getId());
 
-            assertEquals(1L, idCArgumentCaptor.getValue());
+            assertEquals(task.getId(), idCArgumentCaptor.getValue());
 
             verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
             verify(repository, times(1)).deleteById(idCArgumentCaptor.getValue());
