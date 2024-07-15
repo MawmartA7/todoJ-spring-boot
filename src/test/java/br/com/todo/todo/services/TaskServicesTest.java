@@ -305,4 +305,37 @@ public class TaskServicesTest {
             verify(repository, times(0)).save(any());
         }
     }
+
+    @Nested
+    public class deleteTask {
+        @Test
+        @DisplayName("Should delete a task by id")
+        void shouldDeleteATask() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(task));
+
+            taskServices.deleteTask(1L);
+
+            assertEquals(1L, idCArgumentCaptor.getValue());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).deleteById(idCArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("It should throw a NotFoundException exception when the task to be deleted is not found")
+        void shouldThrowNotFoundExceptionWhenTaskToDeleteNotFound() {
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.empty());
+
+            NotFoundException exceptionReturned = assertThrows(NotFoundException.class,
+                    () -> taskServices.deleteTask(1L));
+
+            assertEquals("Task not found", exceptionReturned.getMessage());
+            assertEquals("It was not possible to find a task with the specified id, try another one.",
+                    exceptionReturned.getDetails());
+            assertEquals(1L, idCArgumentCaptor.getValue());
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(0)).deleteById(idCArgumentCaptor.getValue());
+        }
+    }
 }
