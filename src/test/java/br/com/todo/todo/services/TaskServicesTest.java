@@ -240,40 +240,106 @@ public class TaskServicesTest {
 
     @Nested
     class patchPartialUpdateTask {
+        Task taskUpdatedExpected;
+
+        @BeforeEach
+        void setUp() {
+            taskUpdatedExpected = new Task(1L, "Expected Task name", "Expected Task description", 2, true);
+        }
+
         @Test
-        @DisplayName("Should be return a partially updated task")
-        void shouldReturnedAPartiallyUpdatedTask() {
-            Task taskUpdatedExpected = new Task(1L, "Task name updated", "Task description not updated ", 2,
-                    true);
-            Task taskToUpdate = new Task(1L, "Task name to update", "Task description not updated", 3, true);
-            TaskDTO partialUpdate = new TaskDTO(null, "Task name updated", null, 2, null);
+        @DisplayName("should return a task with the all modified fields by the given TaskDTO")
+        void shouldBeReturnATaskWithTheAllModifiedFields() {
+            Task taskToUpdate = new Task(1L, "Task name to update", "Task description to update", 3, false);
+            TaskDTO partialUpdate = new TaskDTO(null, "Expected Task name", "Expected Task description", 2, true);
 
             when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
             when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
 
-            TaskDTO taskDTOPartiallyUpdatedReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+            TaskDTO taskDTOReturned = taskServices.patchPartialUpdateTask(partialUpdate,
                     taskToUpdate.getId());
 
-            assertNotNull(taskDTOPartiallyUpdatedReturned);
-            assertTrue(taskDTOPartiallyUpdatedReturned instanceof TaskDTO);
-            assertTrue(taskToUpdate.getId() == taskUpdatedExpected.getId()
-                    && taskArgumentCaptor.getValue().getId() == taskUpdatedExpected.getId());
-
-            assertEquals(taskArgumentCaptor.getValue().getName(), taskDTOPartiallyUpdatedReturned.name());
-
-            assertEquals(taskUpdatedExpected.getName(), taskDTOPartiallyUpdatedReturned.name());
-            assertEquals(taskUpdatedExpected.getDescription(), taskDTOPartiallyUpdatedReturned.description());
-            assertEquals(taskUpdatedExpected.getPriority(), taskDTOPartiallyUpdatedReturned.priority());
-            assertEquals(taskUpdatedExpected.getDone(), taskDTOPartiallyUpdatedReturned.done());
+            assertEquals(taskUpdatedExpected, taskArgumentCaptor.getValue());
+            assertEquals(new TaskDTO(taskUpdatedExpected), taskDTOReturned);
 
             verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
             verify(repository, times(1)).save(taskArgumentCaptor.getValue());
         }
 
         @Test
-        @DisplayName("It should not update the task when the given fields are null")
-        void shouldNotUpdateTaskWhenFieldsAreNull() {
+        @DisplayName("should return a task with the name modified by the given name")
+        void shouldBeReturnATaskWithTheModifiedName() {
+            Task taskToUpdate = new Task(1L, "Task name to update", "Expected Task description", 2, true);
+            TaskDTO partialUpdate = new TaskDTO(null, "Expected Task name", null, null, null);
 
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
+
+            TaskDTO taskDTOReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+                    taskToUpdate.getId());
+
+            assertEquals(taskUpdatedExpected, taskArgumentCaptor.getValue());
+            assertEquals(new TaskDTO(taskUpdatedExpected), taskDTOReturned);
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("should return a task with the description modified by the given description")
+        void shouldBeReturnATaskWithTheModifiedDescription() {
+            Task taskToUpdate = new Task(1L, "Expected Task name", "Task description to update", 2, true);
+            TaskDTO partialUpdate = new TaskDTO(null, null, "Expected Task description", null, null);
+
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
+
+            TaskDTO taskDTOReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+                    taskToUpdate.getId());
+
+            assertEquals(taskUpdatedExpected, taskArgumentCaptor.getValue());
+            assertEquals(new TaskDTO(taskUpdatedExpected), taskDTOReturned);
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("should return a task with the priority modified by the given priority")
+        void shouldBeReturnATaskWithTheModifiedPriority() {
+            Task taskToUpdate = new Task(1L, "Expected Task name", "Expected Task description", 4, true);
+            TaskDTO partialUpdate = new TaskDTO(null, null, null, 2, null);
+
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
+
+            TaskDTO taskDTOReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+                    taskToUpdate.getId());
+
+            assertEquals(taskUpdatedExpected, taskArgumentCaptor.getValue());
+            assertEquals(new TaskDTO(taskUpdatedExpected), taskDTOReturned);
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
+        }
+
+        @Test
+        @DisplayName("should return a task with the done modified by the given done")
+        void shouldBeReturnATaskWithTheModifiedDone() {
+            Task taskToUpdate = new Task(1L, "Expected Task name", "Expected Task description", 2, false);
+            TaskDTO partialUpdate = new TaskDTO(null, null, null, null, true);
+
+            when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
+            when(repository.save(taskArgumentCaptor.capture())).thenReturn(taskUpdatedExpected);
+
+            TaskDTO taskDTOReturned = taskServices.patchPartialUpdateTask(partialUpdate,
+                    taskToUpdate.getId());
+
+            assertEquals(taskUpdatedExpected, taskArgumentCaptor.getValue());
+            assertEquals(new TaskDTO(taskUpdatedExpected), taskDTOReturned);
+
+            verify(repository, times(1)).findById(idCArgumentCaptor.getValue());
+            verify(repository, times(1)).save(taskArgumentCaptor.getValue());
         }
 
         @Test
