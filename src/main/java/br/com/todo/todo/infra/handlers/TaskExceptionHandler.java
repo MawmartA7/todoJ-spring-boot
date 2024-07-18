@@ -15,18 +15,28 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import br.com.todo.todo.dto.ErrorMessageDTO;
+import br.com.todo.todo.dto.errors.DefaultErrorMessageDTO;
+import br.com.todo.todo.dto.errors.ValidationErrorMessageDTO;
 import br.com.todo.todo.exceptions.NotFoundException;
 
 @ControllerAdvice
 public class TaskExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorMessageDTO> handleNotFoundException(NotFoundException exception) {
-        ErrorMessageDTO errorDTO = new ErrorMessageDTO(HttpStatus.NOT_FOUND, exception.getMessage(),
+    public ResponseEntity<DefaultErrorMessageDTO> handleNotFoundException(NotFoundException exception) {
+        DefaultErrorMessageDTO errorDTO = new DefaultErrorMessageDTO(HttpStatus.NOT_FOUND.value(),
+                exception.getMessage(),
                 exception.getDetails());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
 
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<DefaultErrorMessageDTO> handleIllegalArgumentException(IllegalArgumentException exception) {
+        DefaultErrorMessageDTO errorDTO = new DefaultErrorMessageDTO(HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                "To carry out a partial task update, at least one task field must be supplied");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
 
     @Override
@@ -40,7 +50,9 @@ public class TaskExceptionHandler extends ResponseEntityExceptionHandler {
             String message = error.getDefaultMessage();
             errors.put(fieldName, message);
         });
+        ValidationErrorMessageDTO errorMessage = new ValidationErrorMessageDTO(HttpStatus.BAD_REQUEST.value(),
+                "Validation errors", errors);
 
-        return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 }
