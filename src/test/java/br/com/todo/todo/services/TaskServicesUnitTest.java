@@ -62,10 +62,10 @@ public class TaskServicesUnitTest {
                 taskDTO3 = new TaskDTO(3L, "Other task name", "Other task description", 3, true);
                 taskDTO4 = new TaskDTO(4L, "Other task name", "Other task description", 1, false);
                 tasksDTO = Arrays.asList(taskDTO, taskDTO2, taskDTO3, taskDTO4);
-                task = new Task(1L, "Task name", "Task description", 2, false);
-                task2 = new Task(2L, "Other task name", "Other task description", 1, true);
-                task3 = new Task(3L, "Other task name", "Other task description", 3, true);
-                task4 = new Task(4L, "Other task name", "Other task description", 1, false);
+                task = new Task(taskDTO, taskDTO.id());
+                task2 = new Task(taskDTO2, taskDTO2.id());
+                task3 = new Task(taskDTO3, taskDTO3.id());
+                task4 = new Task(taskDTO4, taskDTO4.id());
                 tasks = Arrays.asList(task, task2, task3, task4);
         }
 
@@ -255,10 +255,17 @@ public class TaskServicesUnitTest {
         @Nested
         class putUpdateTask {
 
+                TaskDTO taskDTOToUpdate;
+
+                @BeforeEach
+                void setup() {
+                        taskDTOToUpdate = new TaskDTO(1L, "Task name to update", "Task description to update", 1, true);
+                }
+
                 @Test
                 @DisplayName("Should be return an updated Task")
                 void shouldReturnedAnUpdatedTask() {
-                        Task taskToUpdate = new Task(1L, "Task name to update", "Task description to update", 1, true);
+                        Task taskToUpdate = new Task(taskDTOToUpdate, taskDTOToUpdate.id());
 
                         when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
                         when(repository.save(taskArgumentCaptor.capture())).thenReturn(task);
@@ -303,17 +310,24 @@ public class TaskServicesUnitTest {
 
         @Nested
         class patchPartialUpdateTask {
+
+                TaskDTO taskDTOToUpdate;
+                TaskDTO taskDTOUpdateExpected;
                 Task taskUpdatedExpected;
 
                 @BeforeEach
                 void setUp() {
-                        taskUpdatedExpected = new Task(1L, "Expected Task name", "Expected Task description", 2, true);
+                        taskDTOToUpdate = new TaskDTO(1L, "Task name to update", "Task description to update", 3,
+                                        false);
+                        taskDTOUpdateExpected = new TaskDTO(1L, "Expected Task name", "Expected Task description", 2,
+                                        true);
+                        taskUpdatedExpected = new Task(taskDTOUpdateExpected, taskDTOUpdateExpected.id());
                 }
 
                 @Test
                 @DisplayName("should return a Task with the all modified fields by the given TaskDTO")
                 void shouldBeReturnATaskWithTheAllModifiedFields() {
-                        Task taskToUpdate = new Task(1L, "Task name to update", "Task description to update", 3, false);
+                        Task taskToUpdate = new Task(taskDTOToUpdate, taskDTOToUpdate.id());
                         TaskDTO partialUpdate = new TaskDTO(null, "Expected Task name", "Expected Task description", 2,
                                         true);
 
@@ -336,7 +350,9 @@ public class TaskServicesUnitTest {
                 @Test
                 @DisplayName("should return a Task with the name modified by the given name")
                 void shouldBeReturnATaskWithTheModifiedName() {
-                        Task taskToUpdate = new Task(1L, "Task name to update", "Expected Task description", 2, true);
+                        Task taskToUpdate = new Task(taskDTOUpdateExpected, 1L);
+                        taskToUpdate.setName("Task name to update");
+
                         TaskDTO partialUpdate = new TaskDTO(null, "Expected Task name", null, null, null);
 
                         when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
@@ -358,7 +374,9 @@ public class TaskServicesUnitTest {
                 @Test
                 @DisplayName("should return a Task with the description modified by the given description")
                 void shouldBeReturnATaskWithTheModifiedDescription() {
-                        Task taskToUpdate = new Task(1L, "Expected Task name", "Task description to update", 2, true);
+                        Task taskToUpdate = new Task(taskDTOUpdateExpected, taskDTOUpdateExpected.id());
+                        taskToUpdate.setDescription("Task description to update");
+
                         TaskDTO partialUpdate = new TaskDTO(null, null, "Expected Task description", null, null);
 
                         when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
@@ -380,7 +398,9 @@ public class TaskServicesUnitTest {
                 @Test
                 @DisplayName("should return a Task with the priority modified by the given priority")
                 void shouldBeReturnATaskWithTheModifiedPriority() {
-                        Task taskToUpdate = new Task(1L, "Expected Task name", "Expected Task description", 4, true);
+                        Task taskToUpdate = new Task(taskDTOUpdateExpected, taskDTOUpdateExpected.id());
+                        taskToUpdate.setPriority(4);
+
                         TaskDTO partialUpdate = new TaskDTO(null, null, null, 2, null);
 
                         when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
@@ -402,7 +422,9 @@ public class TaskServicesUnitTest {
                 @Test
                 @DisplayName("should return a Task with the done modified by the given done")
                 void shouldBeReturnATaskWithTheModifiedDone() {
-                        Task taskToUpdate = new Task(1L, "Expected Task name", "Expected Task description", 2, false);
+                        Task taskToUpdate = new Task(taskDTOUpdateExpected, taskDTOUpdateExpected.id());
+                        taskToUpdate.setDone(false);
+
                         TaskDTO partialUpdate = new TaskDTO(null, null, null, null, true);
 
                         when(repository.findById(idCArgumentCaptor.capture())).thenReturn(Optional.of(taskToUpdate));
